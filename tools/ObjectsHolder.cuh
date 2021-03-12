@@ -2,6 +2,7 @@
 #include "Drawable.cuh"
 #include "SphereDrawable.cuh"
 #include "TriangleDrawable.cuh"
+#include "TriangleMirrorDrawable.cuh"
 #include "VoidDrawable.cuh"
 #include "DeviceList.cu"
 #include "AmbientLightning.cuh"
