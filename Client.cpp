@@ -84,65 +84,51 @@ static VectorDouble getPlayerDir() {
 	return result;
 }
 
+static int addSphereD(float posX, float posY, float posZ, float rad, int colR, int colG, int colB, bool mirror) {
+	int* obj = (int*)malloc(13 * sizeof(int));
+	obj[0] = mirror?4:1;
+	obj[1] = *(int*)&(posX);
+	obj[2] = *(int*)&(posY);
+	obj[3] = *(int*)&(posZ);
+	obj[4] = *(int*)&(rad);
+	obj[5] = colR;
+	obj[6] = colG;
+	obj[7] = colB;
+	int t = addDrawableObj(obj);
+	free(obj);
+	return t;
+}
+
+static int addTriangleD(float a1, float a2, float a3, float b1, float b2, float b3, float c1, float c2, float c3, int colR, int colG, int colB, bool mirror) {
+	int* obj = (int*)malloc(13 * sizeof(int));
+	obj[0] = mirror?3:2;
+	obj[1] = *(int*)&(a1);
+	obj[2] = *(int*)&(a2);
+	obj[3] = *(int*)&(a3);
+	obj[4] = *(int*)&(b1);
+	obj[5] = *(int*)&(b2);
+	obj[6] = *(int*)&(b3);
+	obj[7] = *(int*)&(c1);
+	obj[8] = *(int*)&(c2);
+	obj[9] = *(int*)&(c3);
+	obj[10] = colR;
+	obj[11] = colG;
+	obj[12] = colB;
+	int t = addDrawableObj(obj);
+	free(obj);
+	return t;
+}
+
 static void initClient() {
 	initRayTracer();
 	setCameraArgs(VectorDouble(2, 0, 0), VectorDouble(1, -0.5, 0), VectorDouble(0, 1, 0), 90);
 	
-	int* obj1 = (int*)malloc(13*sizeof(int));
-	obj1[0] = 1;
-	float posX = 0;
-	float posY = 0;
-	float posZ = 1;
-	float rad = 0.7;
-	obj1[1] = *(int*)&(posX);
-	obj1[2] = *(int*)&(posY);
-	obj1[3] = *(int*)&(posZ);
-	obj1[4] = *(int*)&(rad);
-	obj1[5] = 0;
-	obj1[6] = 16000;
-	obj1[7] = 0;
-	addDrawableObj(obj1);
+	addSphereD(0, 0, 1, 0.7, 0, 16000, 0, false);
+	addSphereD(0, 0.2, -1, 0.3, 8000, 0, 16000, false);
 
-	posX = 0;
-	posY = 0.2;
-	posZ = -1;
-	rad = 0.3;
-	obj1[1] = *(int*)&(posX);
-	obj1[2] = *(int*)&(posY);
-	obj1[3] = *(int*)&(posZ);
-	obj1[4] = *(int*)&(rad);
-	obj1[5] = 8000;
-	obj1[6] = 0;
-	obj1[7] = 16000;
-	addDrawableObj(obj1);
-	free(obj1);
-
-	int* obj2 = (int*)malloc(13 * sizeof(int));
-	obj2[0] = 2;
-	float A1, A2, A3, B1, B2, B3, C1, C2, C3;
-	A1 = -1;
-	A2 = -0.5;
-	A3 = -1;
-	B1 = -1;
-	B2 = -1;
-	B3 = 1;
-	C1 = 1;
-	C2 = -1;
-	C3 = 0;
-	obj2[1] = *(int*)&(A1);
-	obj2[2] = *(int*)&(A2);
-	obj2[3] = *(int*)&(A3);
-	obj2[4] = *(int*)&(B1);
-	obj2[5] = *(int*)&(B2);
-	obj2[6] = *(int*)&(B3);
-	obj2[7] = *(int*)&(C1);
-	obj2[8] = *(int*)&(C2);
-	obj2[9] = *(int*)&(C3);
-	obj2[10] = -1;
-	obj2[11] = 0;
-	obj2[12] = 0;
-	addDrawableObj(obj2);
-	free(obj2);
+	addTriangleD(-50, -1, -50, -50, -1, 50, 50, -1, 50, 8000, 1000, 1000, false);
+	addTriangleD(50, -1, 50, 50, -1, -50, -50, -1, -50, 8000, 2000, 1000, false);
+	addTriangleD(-1, -0.5, -1, -1, -1, 1, 1, -1, 0, 27195, 27195, 29490, true);
 
 	int* obj3 = (int*)malloc(8 * sizeof(int));
 	obj3[0] = 1;
@@ -150,10 +136,10 @@ static void initClient() {
 	float posY2 = 10;
 	float posZ2 = 5;
 	float att = 99;
-	obj3[1] = *(int*)&(posX);
-	obj3[2] = *(int*)&(posY);
-	obj3[3] = *(int*)&(posZ);
-	obj3[7] = *(int*)&(rad);
+	obj3[1] = *(int*)&(posX2);
+	obj3[2] = *(int*)&(posY2);
+	obj3[3] = *(int*)&(posZ2);
+	obj3[7] = *(int*)&(att);
 	obj3[4] = 8000;
 	obj3[5] = 8000;
 	obj3[6] = 8000;
