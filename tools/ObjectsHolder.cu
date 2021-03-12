@@ -74,6 +74,25 @@ __device__ void ObjectsHolder::addDDrawable(int* args)
 		dDsize = dDrawables->getSize();
 		break;
 	}
+	case 3:
+	{
+		float a1 = *(float*)&(args[1]);
+		float a2 = *(float*)&(args[2]);
+		float a3 = *(float*)&(args[3]);
+		float b1 = *(float*)&(args[4]);
+		float b2 = *(float*)&(args[5]);
+		float b3 = *(float*)&(args[6]);
+		float c1 = *(float*)&(args[7]);
+		float c2 = *(float*)&(args[8]);
+		float c3 = *(float*)&(args[9]);
+		Drawable* obj = new TriangleMirrorDrawable(VectorDouble(a1, a2, a3), VectorDouble(b1, b2, b3), VectorDouble(c1, c2, c3), Color6Component(args[10], args[11], args[12]));
+		int* tempsize = new int;
+		*tempsize = dDsize;
+		dInts->add(tempsize);
+		dDrawables->add(obj);
+		dDsize = dDrawables->getSize();
+		break;
+	}
 	default:
 	{
 		Drawable* obj = new VoidDrawable();
@@ -226,7 +245,7 @@ __device__ Color6Component ObjectsHolder::hit(Ray * r, double tmin, double tmax,
 	Ray tempRay, actualray;
 	actualray = *r;
 	tempRay = Ray();
-	VectorDouble factor = VectorDouble(100.0, 100.0, 100.0);
+	VectorDouble factor = VectorDouble(1.0, 1.0, 1.0);
 
 	HitRecord localHit;
 	Color6Component localColor;
@@ -248,14 +267,15 @@ __device__ Color6Component ObjectsHolder::hit(Ray * r, double tmin, double tmax,
 				}
 				closest = temp.t;
 				localHit = temp;
-				localColor = dDrawables->at(i)->getColor(&temp);
+				Color6Component tempC = dDrawables->at(i)->getColor(&temp);
+				localColor = Color6Component(tempC.rComponent*factor.getX(), tempC.gComponent*factor.getY(), tempC.bComponent*factor.getZ());
 				localLight = getLightValueAt(&temp.point);
 			}
 		}
 		if (recalculate) {
-			factor.setX(factor.getX()*0.83);
-			factor.setY(factor.getY()*0.83);
-			factor.setZ(factor.getZ()*0.9);
+			factor.setX(localColor.rComponent / 32767);
+			factor.setY(localColor.gComponent / 32767);
+			factor.setZ(localColor.bComponent / 32767);
 			actualray = tempRay;
 			closest = tmax - closest;
 			reflect++;
@@ -263,8 +283,11 @@ __device__ Color6Component ObjectsHolder::hit(Ray * r, double tmin, double tmax,
 		}
 	} while (recalculate && reflect < rmax);
 	if (!hit) {
-		double t = 0.5 * (r->getDirection().unitVector().getY() + 1.0);
+		double t = 0.5 * (actualray.getDirection().unitVector().getY() + 1.0);
 		localColor = Color6Component(((1.0 - t) + t * dSkyBoxColor.rComponent), ((1.0 - t) + t * dSkyBoxColor.gComponent), ((1.0 - t) + t * dSkyBoxColor.bComponent));
+	}
+	else {
+		localColor = localColor.add(localLight);
 	}
 	return localColor;
 }
