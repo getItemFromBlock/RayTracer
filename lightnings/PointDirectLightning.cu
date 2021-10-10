@@ -2,12 +2,12 @@
 
 __device__ PointDirectLightning::PointDirectLightning()
 {
-	center = VectorDouble();
+	center = Vector3D();
 	light = Color6Component();
 	atenuation = 100.0;
 }
 
-__device__ PointDirectLightning::PointDirectLightning(VectorDouble origin, Color6Component lightcolor, double atenuationByDist)
+__device__ PointDirectLightning::PointDirectLightning(Vector3D origin, Color6Component lightcolor, float atenuationByDist)
 {
 	center = origin;
 	light = lightcolor;
@@ -16,22 +16,22 @@ __device__ PointDirectLightning::PointDirectLightning(VectorDouble origin, Color
 
 __device__ PointDirectLightning::PointDirectLightning(const DirectLightning& obj) : DirectLightning(obj)
 {
-
+	atenuation = 0;
 }
 
 __device__ PointDirectLightning::~PointDirectLightning()
 {
 }
 
-__device__ VectorDouble PointDirectLightning::getPos()
+__device__ Vector3D PointDirectLightning::getPos()
 {
 	return center;
 }
 
-__device__ Color6Component PointDirectLightning::getLightByDistance(double dist)
+__device__ Color6Component PointDirectLightning::getLightByDistance(float dist)
 {
-	double r = light.rComponent*powf(atenuation / 100.0, dist);
-	double g = light.gComponent*powf(atenuation / 100.0, dist);
-	double b = light.bComponent*powf(atenuation / 100.0, dist);
+	float r = light.rComponent*powf(atenuation / 100.0, dist);
+	float g = light.gComponent*powf(atenuation / 100.0, dist);
+	float b = light.bComponent*powf(atenuation / 100.0, dist);
 	return Color6Component(r, g, b);
 }

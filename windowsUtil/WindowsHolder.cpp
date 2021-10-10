@@ -2,7 +2,7 @@
 
 WindowsHolder::WindowsHolder(HWND param): windowH(param)
 {
-	inputValues = (bool*)malloc(keyBoardSize*sizeof(bool));
+	inputValues = new bool[keyBoardSize];
 	for (unsigned int i = 0; i < keyBoardSize; i++) {
 		inputValues[i] = false;
 	}
@@ -10,7 +10,7 @@ WindowsHolder::WindowsHolder(HWND param): windowH(param)
 
 WindowsHolder::~WindowsHolder()
 {
-	free(inputValues);
+	delete[] inputValues;
 }
 
 void WindowsHolder::setInputValue(char input, bool state)
@@ -60,6 +60,11 @@ void WindowsHolder::setInputValue(char input, bool state)
 	case VK_ESCAPE:
 	{
 		inputValues[8] = state;
+		break;
+	}
+	case 'W':
+	{
+		inputValues[9] = state;
 		break;
 	}
 
@@ -121,6 +126,11 @@ bool WindowsHolder::getInputValue(char input)
 	case VK_ESCAPE:
 	{
 		result = inputValues[8];
+		break;
+	}
+	case 'W':
+	{
+		result = inputValues[9];
 		break;
 	}
 

@@ -1,8 +1,8 @@
 #include "TriangleMirrorDrawable.cuh"
 
 
-__device__ TriangleMirrorDrawable::TriangleMirrorDrawable(VectorDouble point1, VectorDouble point2, VectorDouble point3, Color6Component c) :
-	A(point1), B(point2), C(point3), color(c) // constructeur - définition
+__device__ TriangleMirrorDrawable::TriangleMirrorDrawable(Vector3D point1, Vector3D point2, Vector3D point3, Color6Component c, int subType) :
+	A(point1), B(point2), C(point3), color(c), type(subType) // constructeur - définition
 {
 	AB = B.sub(A);
 	AC = C.sub(A);
@@ -10,14 +10,14 @@ __device__ TriangleMirrorDrawable::TriangleMirrorDrawable(VectorDouble point1, V
 }
 
 __device__ TriangleMirrorDrawable::TriangleMirrorDrawable() :
-	A(VectorDouble()), B(VectorDouble()), C(VectorDouble()), color(Color6Component())
+	A(Vector3D()), B(Vector3D()), C(Vector3D()), color(Color6Component()), type(0)
 {
-	normal = VectorDouble(0, 1, 0);
-	AB = VectorDouble();
-	AC = VectorDouble();
+	normal = Vector3D(0, 1, 0);
+	AB = Vector3D();
+	AC = Vector3D();
 }
 
-__device__ TriangleMirrorDrawable::TriangleMirrorDrawable(const Drawable& obj) : Drawable(obj)
+__device__ TriangleMirrorDrawable::TriangleMirrorDrawable(const Drawable& obj) : Drawable(obj), type(0)
 {
 
 }
@@ -27,16 +27,16 @@ __device__ TriangleMirrorDrawable::~TriangleMirrorDrawable() // Destructeur - dé
 
 }
 
-__device__ HitRecord TriangleMirrorDrawable::hit(Ray r, double tmin, double tmax)
+__device__ HitRecord TriangleMirrorDrawable::hit(Ray r, float tmin, float tmax)
 {
 	HitRecord rec = HitRecord();
-	double det = -r.getDirection().dot(normal);
-	double invdet = 1.0 / det;
-	VectorDouble AO = r.getOrigin().sub(A);
-	VectorDouble DAO = AO.cross(r.getDirection());
+	float det = -r.getDirection().dot(normal);
+	float invdet = 1.0 / det;
+	Vector3D AO = r.getOrigin().sub(A);
+	Vector3D DAO = AO.cross(r.getDirection());
 	rec.u = AC.dot(DAO)*invdet;
 	rec.v = -AB.dot(DAO)*invdet;
-	double t = AO.dot(normal)*invdet;
+	float t = AO.dot(normal)*invdet;
 	if (det >= 1e-6 && t >= tmin && t <= tmax && rec.u >= 0.0 && rec.v >= 0.0 && rec.u + rec.v <= 1.0) {
 		rec.normal = r.getDirection().sub(normal.unitVector().mul((r.getDirection().dot(normal.unitVector())*2.0)));
 		rec.point = r.getOrigin().add(r.getDirection().mul(t));
@@ -57,19 +57,6 @@ __device__ bool TriangleMirrorDrawable::doReflect()
 	return true;
 }
 
-__device__ double TriangleMirrorDrawable::getVHitBox(VectorDouble* position)
-{
-	Ray down = Ray(VectorDouble(position->getX(), position->getY(), position->getZ()), VectorDouble(0, -1, 0));
-	double det = -down.getDirection().dot(normal);
-	double invdet = 1.0 / det;
-	VectorDouble AO = down.getOrigin().sub(A);
-	VectorDouble DAO = AO.cross(down.getDirection());
-	double ub = AC.dot(DAO)*invdet;
-	double vb = -AB.dot(DAO)*invdet;
-	double t = AO.dot(normal)*invdet;
-
-	if (det >= 1e-6 && t >= 0 && t <= 0.6 && ub >= -0.2 && vb >= -0.2 && ub + vb <= 1.2) {
-		return down.getOrigin().add(down.getDirection().mul(t)).getY();
-	}
-	return -50000;
+__device__ int TriangleMirrorDrawable::getSubType() {
+	return type;
 }

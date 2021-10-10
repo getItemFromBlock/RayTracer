@@ -1,27 +1,27 @@
-#include "SphereDrawable.cuh"
+#include "SphereMirrorDrawable.cuh"
 
 
-__device__ SphereDrawable::SphereDrawable(Vector3D position, float rayon, Color6Component couleur, int subType): // constructeur - définition
+__device__ SphereMirrorDrawable::SphereMirrorDrawable(Vector3D position, float rayon, Color6Component couleur, int subType) : // constructeur - définition
 	pos(position), radius(rayon), color(couleur), type(subType)
 {
 }
 
-__device__ SphereDrawable::SphereDrawable():
+__device__ SphereMirrorDrawable::SphereMirrorDrawable() :
 	pos(Vector3D()), radius(1), color(Color6Component()), type(0)
 {
 }
 
-__device__ SphereDrawable::SphereDrawable(const Drawable& obj) : Drawable(obj), radius(1), type(0)
+__device__ SphereMirrorDrawable::SphereMirrorDrawable(const Drawable& obj) : Drawable(obj), radius(1), type(0)
 {
 
 }
 
-__device__ SphereDrawable::~SphereDrawable() // Destructeur - définition
+__device__ SphereMirrorDrawable::~SphereMirrorDrawable() // Destructeur - définition
 {
 
 }
 
-__device__ HitRecord SphereDrawable::hit(Ray r, float tmin, float tmax)
+__device__ HitRecord SphereMirrorDrawable::hit(Ray r, float tmin, float tmax)
 {
 	HitRecord rec = HitRecord();
 	rec.isEmpty = true;
@@ -42,6 +42,7 @@ __device__ HitRecord SphereDrawable::hit(Ray r, float tmin, float tmax)
 			rec.setFaceNormal((r), outward_normal);
 			if (rec.front_face) {
 				rec.isEmpty = false;
+				rec.normal = r.getDirection().sub(rec.normal.unitVector().mul((r.getDirection().dot(rec.normal.unitVector()) * 2.0)));
 				return rec;
 			}
 		}
@@ -54,6 +55,7 @@ __device__ HitRecord SphereDrawable::hit(Ray r, float tmin, float tmax)
 			rec.setFaceNormal((r), outward_normal);
 			if (rec.front_face) {
 				rec.isEmpty = false;
+				rec.normal = r.getDirection().sub(rec.normal.unitVector().mul((r.getDirection().dot(rec.normal.unitVector()) * 2.0)));
 				return rec;
 			}
 		}
@@ -61,16 +63,16 @@ __device__ HitRecord SphereDrawable::hit(Ray r, float tmin, float tmax)
 	return rec;
 }
 
-__device__ Color6Component SphereDrawable::getColor(HitRecord* hit)
+__device__ Color6Component SphereMirrorDrawable::getColor(HitRecord* hit)
 {
 	return color;
 }
 
-__device__ bool SphereDrawable::doReflect()
+__device__ bool SphereMirrorDrawable::doReflect()
 {
-	return false;
+	return true;
 }
 
-__device__ int SphereDrawable::getSubType() {
+__device__ int SphereMirrorDrawable::getSubType() {
 	return type;
 }

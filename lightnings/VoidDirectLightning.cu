@@ -12,12 +12,12 @@ __device__ VoidDirectLightning::~VoidDirectLightning()
 {
 }
 
-__device__ VectorDouble VoidDirectLightning::getPos()
+__device__ Vector3D VoidDirectLightning::getPos()
 {
-	return VectorDouble();
+	return Vector3D();
 }
 
-__device__ Color6Component VoidDirectLightning::getLightByDistance(double dist)
+__device__ Color6Component VoidDirectLightning::getLightByDistance(float dist)
 {
 	return Color6Component();
 }

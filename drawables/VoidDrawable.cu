@@ -12,7 +12,7 @@ __device__ VoidDrawable::~VoidDrawable()
 {
 }
 
-__device__ HitRecord VoidDrawable::hit(Ray r, double tmin, double tmax)
+__device__ HitRecord VoidDrawable::hit(Ray r, float tmin, float tmax)
 {
 	return HitRecord();
 }
@@ -27,7 +27,6 @@ __device__ bool VoidDrawable::doReflect()
 	return false;
 }
 
-__device__ double VoidDrawable::getVHitBox(VectorDouble* position)
-{
-	return -50000;
+__device__ int VoidDrawable::getSubType() {
+	return 0;
 }

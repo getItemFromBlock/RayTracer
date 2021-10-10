@@ -1,6 +1,6 @@
 #pragma once
-#include "VectorDouble.cuh"
-#include "Color6Component.cuh"
+#include "../tools/Vector3D.cuh"
+#include "../tools/Color6Component.cuh"
 class AmbientLightning
 {
 public:

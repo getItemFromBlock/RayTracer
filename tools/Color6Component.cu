@@ -28,10 +28,10 @@ __device__ Color6Component::~Color6Component()
 
 __device__ Color6Component::Color6Component(int r, int g, int b, bool fromRGB) {
 	if (fromRGB) {
-		Color6Component(r*128 + r/2, g*128 + g/2, b*128 + b/2);
+		*this = Color6Component::Color6Component(r*128 + r/2, g*128 + g/2, b*128 + b/2);
 	}
 	else {
-		Color6Component(r, g, b);
+		*this = Color6Component::Color6Component(r, g, b);
 	}
 }
 

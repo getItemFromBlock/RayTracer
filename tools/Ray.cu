@@ -1,31 +1,31 @@
 #include "Ray.cuh"
 
-__device__ Ray::Ray(VectorDouble originV, VectorDouble directionV) : origin(originV), direction(directionV) // constructeur - définition
+__host__ __device__ Ray::Ray(Vector3D originV, Vector3D directionV) : origin(originV), direction(directionV) // constructeur - définition
 {
 
 }
 
-__device__ Ray::Ray() : origin(VectorDouble()), direction(VectorDouble())
+__host__ __device__ Ray::Ray() : origin(Vector3D()), direction(Vector3D())
 {
 
 }
 
-__device__ Ray::~Ray() // Destructeur - définition
+__host__ __device__ Ray::~Ray() // Destructeur - définition
 {
 
 }
 
-__device__ VectorDouble Ray::getOrigin()
+__host__ __device__ Vector3D Ray::getOrigin()
 {
 	return origin;
 }
 
-__device__ VectorDouble Ray::getDirection()
+__host__ __device__ Vector3D Ray::getDirection()
 {
 	return direction;
 }
 
-__device__ VectorDouble Ray::at(double t)
+__host__ __device__ Vector3D Ray::at(float t)
 {
 	return origin.add(direction.mul(t));
 }

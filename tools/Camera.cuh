@@ -6,19 +6,19 @@
 class Camera
 {
 public:
-	__device__ Camera(VectorDouble lookfrom, VectorDouble direction, VectorDouble vup, double vfov, double aspect_ratio);	// Constructeur - déclaration
+	__device__ Camera(Vector3D lookfrom, Vector3D direction, Vector3D vup, float vfov, float aspect_ratio);	// Constructeur - déclaration
 	__device__ Camera(); // Compat
 	__device__ ~Camera(); // Destructeur
 
-	__device__ void refresh(VectorDouble lookfrom, VectorDouble direction, VectorDouble vup, double vfov, double aspect_ratio);
+	__device__ void refresh(Vector3D lookfrom, Vector3D direction, Vector3D vup, float vfov, float aspect_ratio);
 
-	__device__ Ray getRay(double u, double v);
+	__device__ Ray getRay(float u, float v);
 
-	__device__ double toRadians(double input);
+	__device__ float toRadians(float input);
 private:
-	VectorDouble origin;
-	VectorDouble horizontal;
-	VectorDouble vertical;
-	VectorDouble lower_left_corner;
+	Vector3D origin;
+	Vector3D horizontal;
+	Vector3D vertical;
+	Vector3D lower_left_corner;
 
 };

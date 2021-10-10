@@ -1,17 +1,20 @@
-#include "kernel_wrapper.cuh"
-#include "Header.h"
 #include <tchar.h>
 #include <Windows.h>
 #include <Windowsx.h>
 #include <WinUser.h>
-#include "Client.cpp"
-#include "WindowsHolder.h"
+#include "./windowsUtil/Client.cpp"
+#include "./windowsUtil/Server.cpp"
+#include "./windowsUtil/WindowsHolder.h"
+
 
 int height, width;
 WindowsHolder* windowW;
+ObjectsHolder* objHolder;
 HCURSOR cursorBase, cursorHide;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+HANDLE clientHandle, serverHandle;
+
 
 void resizeClient(int Nwidth, int Nheight) {
 	if (Nwidth != width || Nheight != height) {
@@ -24,7 +27,7 @@ void resizeClient(int Nwidth, int Nheight) {
 	}
 }
 
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow)
+int WINAPI wWinMain(_In_ HINSTANCE hInstance,_In_opt_ HINSTANCE hPrevInstance,_In_ LPWSTR pCmdLine,_In_ int nCmdShow)
 {
 	// Register the window class.
 	const char CLASS_NAME[] = _T("RayTracingMain");
@@ -35,6 +38,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 	wc.style = CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = (WNDPROC)WindowProc;
 	wc.hInstance = hInstance;
+	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	//wc.hCursor = cursorBase;
 	wc.lpszClassName = CLASS_NAME;
 
@@ -63,27 +67,28 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 	}
 
 	ShowWindow(hwnd, nCmdShow);
-
+	
 	
 	// Run the message loop.
 	RECT rect;
 	GetClientRect(hwnd, &rect);
 	height = rect.bottom - rect.top;
 	width = rect.right - rect.left;
+	objHolder = new ObjectsHolder();
 	windowW = new WindowsHolder(hwnd);
 	windowW->setDrawSize(width, height);
 
-	DWORD clientThreadID;
-	HANDLE clientHandle = CreateThread(0, 0, clientMain, windowW, 0, &clientThreadID);
+	ThreadArgs* threadArg = new ThreadArgs(windowW,objHolder);
+
+	DWORD clientThreadID, serverThreadID;
+	clientHandle = CreateThread(0, 0, clientMain, threadArg, 0, &clientThreadID);
+	serverHandle = CreateThread(0, 0, serverMain, threadArg, 0, &serverThreadID);
+
+	
 
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		if (windowW->exitWindow) {
-			windowW->exitWindow = false;
-			CloseHandle(clientHandle);
-			DestroyWindow(hwnd);
-		}
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
@@ -95,11 +100,6 @@ LRESULT APIENTRY WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
-	case WM_DESTROY:
-	{
-		PostQuitMessage(0);
-		break;
-	}
 	case WM_KEYDOWN:
 	{
 		char keyCode = (char)wParam;
@@ -136,10 +136,13 @@ LRESULT APIENTRY WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		int* screen = windowW->getOutputScreen();
 		if (!windowW->sizing && screen) {
-			int maxX = screen[0];
-			int maxY = screen[1];
+			long long int maxX = screen[0];
+			long long int maxY = screen[1];
 
 			COLORREF *colors = (COLORREF*)calloc(maxX*maxY, sizeof(COLORREF));
+			if (!colors) {
+				break;
+			}
 			memcpy(colors, screen + 2, maxX*maxY * sizeof(int));
 			screen = windowW->getOutputScreen();
 			if (screen &&
@@ -214,6 +217,22 @@ LRESULT APIENTRY WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SetCursor(cursorBase);
 		}
 		break;
+	}
+	case WM_CLOSE:
+	{
+		//if (MessageBox(hwnd, "Really quit?", "Ray Tracer", MB_OKCANCEL) == IDOK)
+		{
+			DestroyWindow(hwnd);
+		}
+		return 0;
+	}
+	case WM_DESTROY:
+	{
+		CloseHandle(clientHandle);
+		CloseHandle(serverHandle);
+		clearClient();
+		PostQuitMessage(0);
+		return 0;
 	}
 	return 0;
 
