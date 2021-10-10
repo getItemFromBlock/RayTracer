@@ -1,12 +1,26 @@
 # RayTracer
-Version réécrite en langage C++/CUDA du projet Ray-Tracing
+
+## Version réécrite en langage C++/CUDA du projet Ray-Tracing
 
 
 
-ChangeLog
+## ChangeLog
+
+### 10/10/2021
+
+Réorganisation des fichiers
+Ajout du nouveau type "SphereDrawableMirror"
+Debug du système de lumière et d'ombres
+Ajout de shading pour les surfaces éclairées:non éclairées
+Ajout de collisions
+Ajout des métadata, premettant de désactiver certains paramètres sur les objets:
+  -  Désactiver les collisions
+  -  Désactiver la projection d'ombre
+Appuyer sur 'w' permet de zoomer
+Optimisations globales
 
 
-12/03/2021
+### 12/03/2021
 
 Ajout des fichiers manquants "SphereDrawable", "TriangleDrawable" et "VoidDrawable"
 
